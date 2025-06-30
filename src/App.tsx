@@ -16,6 +16,7 @@ const App: React.FC = () => {
   const [currentFile, setCurrentFile] = useState<string>('');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [pastedText, setPastedText] = useState<string>('');
+  const [questionCount, setQuestionCount] = useState<number>(5);
 
   const t = getTranslations(language);
 
@@ -60,7 +61,7 @@ const App: React.FC = () => {
       const { RealFileProcessor } = await import('./services/realFileProcessor');
       
       // Process the actual file with AI
-      const generatedQuestions = await RealFileProcessor.processFile(file, language);
+      const { questions: generatedQuestions } = await RealFileProcessor.saveFileAndProcess(file, language, questionCount);
       
       setQuestions(generatedQuestions);
       setCurrentView('study-select');
@@ -105,7 +106,7 @@ const App: React.FC = () => {
       const { RealFileProcessor } = await import('./services/realFileProcessor');
       
       // Process the pasted text directly
-      const generatedQuestions = await RealFileProcessor.generateQuestionsWithAI(pastedText, language);
+      const generatedQuestions = await RealFileProcessor.processText(pastedText, language, questionCount);
       
       setQuestions(generatedQuestions);
       setCurrentView('study-select');
@@ -153,6 +154,24 @@ const App: React.FC = () => {
               : 'Paste your text here...'}
             className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-black transition-colors resize-none text-sm"
           />
+          
+          {/* Question Count Selector */}
+          <div className="flex items-center justify-center mt-3 space-x-4">
+            <label className="text-sm text-gray-600">
+              {language === 'kz' ? 'Сұрақ саны:' : 'Questions:'}
+            </label>
+            <select
+              value={questionCount}
+              onChange={(e) => setQuestionCount(Number(e.target.value))}
+              className="px-3 py-1 border border-gray-300 rounded focus:outline-none focus:border-black text-sm"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={40}>40</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+          
           <button
             onClick={handleTextProcess}
             disabled={!pastedText.trim()}
@@ -328,7 +347,7 @@ const App: React.FC = () => {
                 onClick={() => setCurrentView('home')}
                 className="text-2xl font-play hover:opacity-70 transition-opacity"
               >
-                {t.logo}
+                dayne
               </button>
             </div>
             
